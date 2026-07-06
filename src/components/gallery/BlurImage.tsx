@@ -28,6 +28,8 @@ export function BlurImage({ src, alt, color, className, ...props }: BlurImagePro
       <img
         src={currentSrc}
         alt={alt}
+        loading="lazy"
+        decoding="async"
         className={cn(
           "w-full h-full object-cover transition-opacity duration-700 ease-in-out",
           isLoading ? "opacity-0" : "opacity-100"

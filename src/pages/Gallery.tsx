@@ -31,12 +31,10 @@ export default function Gallery() {
   // Collection Modal state
   const [collectionImage, setCollectionImage] = useState<ImageDetails | null>(null);
 
-  const activeQuery = category !== "All" ? `${category} ${debouncedSearch}`.trim() : debouncedSearch;
-
-  const loadImages = useCallback(async (pageNum: number, query: string) => {
+  const loadImages = useCallback(async (pageNum: number, query: string, cat: string) => {
     setIsLoading(true);
     try {
-      const response = await fetchImages(pageNum, 20, query);
+      const response = await fetchImages(pageNum, 20, query, cat);
       setImages(prev => pageNum === 1 ? response.images : [...prev, ...response.images]);
       setHasMore(pageNum < response.totalPages);
     } catch (error) {
@@ -50,14 +48,14 @@ export default function Gallery() {
   useEffect(() => {
     setPage(1);
     setImages([]);
-    loadImages(1, activeQuery);
-  }, [activeQuery, loadImages]);
+    loadImages(1, debouncedSearch, category);
+  }, [debouncedSearch, category, loadImages]);
 
   const handleLoadMore = () => {
     if (!isLoading && hasMore) {
       const nextPage = page + 1;
       setPage(nextPage);
-      loadImages(nextPage, activeQuery);
+      loadImages(nextPage, debouncedSearch, category);
     }
   };
 
@@ -85,19 +83,19 @@ export default function Gallery() {
       {/* Search Bar */}
       <div className="max-w-xl mx-auto w-full mb-8 relative">
         <div className="relative group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground group-focus-within:text-primary transition-colors z-10" />
           <Input
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search for high-resolution images..."
-            className="w-full pl-12 pr-12 h-14 rounded-full bg-secondary/30 border-border/50 focus-visible:ring-1 focus-visible:ring-primary shadow-sm text-base backdrop-blur-md transition-all"
+            className="w-full pl-12 pr-12 h-14 rounded-full bg-secondary/30 border-border/50 focus-visible:ring-1 focus-visible:ring-primary shadow-sm text-base backdrop-blur-md transition-all relative z-0"
             autoFocus={initialSearch !== ""}
           />
           {searchTerm && (
             <Button
               variant="ghost"
               size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full text-muted-foreground hover:text-foreground"
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full text-muted-foreground hover:text-foreground z-10"
               onClick={clearSearch}
             >
               <X className="h-5 w-5" />

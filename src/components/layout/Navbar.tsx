@@ -1,9 +1,10 @@
 import { Link, NavLink } from "react-router";
-import { Search, Image as ImageIcon, Heart, LayoutGrid, Menu } from "lucide-react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { Image as ImageIcon, Heart, LayoutGrid, Menu } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Logo } from "@/components/layout/Logo";
+import { InfoPanel } from "@/components/layout/InfoPanel";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
 export function Navbar() {
@@ -43,11 +44,8 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
-            <Link to="/gallery?search=focus" className={cn(buttonVariants({ variant: "ghost", size: "icon" }), "hidden sm:flex rounded-full")}>
-              <Search className="h-[1.2rem] w-[1.2rem]" />
-              <span className="sr-only">Search</span>
-            </Link>
             <ThemeToggle />
+            <InfoPanel />
 
             {/* Mobile Menu */}
             <Sheet>
@@ -72,10 +70,7 @@ export function Navbar() {
                       {link.name}
                     </NavLink>
                   ))}
-                  <Link to="/gallery?search=focus" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
-                     <Search className="h-4 w-4" />
-                     Search
-                  </Link>
+
                 </nav>
               </SheetContent>
             </Sheet>

@@ -34,14 +34,20 @@ const mapUnsplashData = (photo: any): ImageDetails => {
 export const fetchImages = async (
   page: number = 1,
   perPage: number = 20,
-  query: string = ""
+  query: string = "",
+  category: string = "All"
 ): Promise<{ images: ImageDetails[]; totalPages: number }> => {
   
+  let apiQuery = query;
+  if (category !== "All") {
+    apiQuery = query ? `${category} ${query}` : category;
+  }
+
   // Try to use API if key exists
   if (UNSPLASH_ACCESS_KEY) {
     try {
-      const endpoint = query 
-        ? `${UNSPLASH_API_URL}/search/photos?query=${encodeURIComponent(query)}&page=${page}&per_page=${perPage}`
+      const endpoint = apiQuery 
+        ? `${UNSPLASH_API_URL}/search/photos?query=${encodeURIComponent(apiQuery)}&page=${page}&per_page=${perPage}`
         : `${UNSPLASH_API_URL}/photos?page=${page}&per_page=${perPage}&order_by=popular`;
         
       const response = await fetch(endpoint, {
@@ -56,7 +62,7 @@ export const fetchImages = async (
 
       const data = await response.json();
       
-      if (query) {
+      if (apiQuery) {
         return {
           images: data.results.map(mapUnsplashData),
           totalPages: data.total_pages || 1,
@@ -64,7 +70,7 @@ export const fetchImages = async (
       } else {
         return {
           images: data.map(mapUnsplashData),
-          totalPages: 100, // Unsplash returns max 1000 items in standard endpoint usually
+          totalPages: 100,
         };
       }
     } catch (error) {
@@ -76,31 +82,33 @@ export const fetchImages = async (
   return new Promise((resolve) => {
     setTimeout(() => {
       let filtered = mockImages;
+      
+      if (category !== "All") {
+        filtered = filtered.filter((img) => 
+          img.tags?.some((t) => t.toLowerCase() === category.toLowerCase())
+        );
+      }
+
       if (query) {
-        const lowerQuery = query.toLowerCase();
-        filtered = mockImages.filter(
-          (img) =>
-            img.description?.toLowerCase().includes(lowerQuery) ||
-            img.alt_description?.toLowerCase().includes(lowerQuery) ||
-            img.tags?.some((t) => t.toLowerCase().includes(lowerQuery)) ||
-            img.author.name.toLowerCase().includes(lowerQuery)
+        const queryWords = query.toLowerCase().split(/\s+/).filter(Boolean);
+        filtered = filtered.filter((img) =>
+          queryWords.every(
+            (word) =>
+              img.description?.toLowerCase().includes(word) ||
+              img.alt_description?.toLowerCase().includes(word) ||
+              img.tags?.some((t) => t.toLowerCase().includes(word)) ||
+              img.author.name.toLowerCase().includes(word)
+          )
         );
       }
       
-      // Simulate pagination for mock data
-      // For mock data, we just return the filtered data if page=1, else empty
-      // To simulate infinite scroll, we can repeat mock data if no query, just to show how it works
-      let results = filtered;
-      if (!query && page > 1 && page <= 5) {
-        results = mockImages.map(m => ({ ...m, id: `${m.id}-${page}` })); // duplicate with new ID
-      } else if (page > 5 || (query && page > 1)) {
-        results = [];
-      }
+      const startIndex = (page - 1) * perPage;
+      const results = filtered.slice(startIndex, startIndex + perPage);
 
       resolve({
         images: results,
-        totalPages: query ? 1 : 5,
+        totalPages: Math.ceil(filtered.length / perPage) || 1,
       });
-    }, 800); // simulate network delay
+    }, 800);
   });
 };
