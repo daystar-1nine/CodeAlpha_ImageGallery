@@ -36,9 +36,9 @@
 | :---: | :---: |
 | ![Landing Page Dark Mode](./docs/landing-dark.png) | ![Landing Page Light Mode](./docs/landing-light.png) |
 
-| Gallery & Masonry Grid | Image Lightbox |
-| :---: | :---: |
-| ![Gallery Explore](./docs/gallery.png) | <img src="https://via.placeholder.com/800x450.png?text=High-Resolution+Lightbox" width="100%" alt="Lightbox" /> |
+| Gallery & Masonry Grid |
+| :---: |
+| ![Gallery Explore](./docs/gallery.png) |
 
 | Favorites Dashboard | Custom Collections |
 | :---: | :---: |
